@@ -1,67 +1,57 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
 const signUp = (req, res) => {
-    res.render('auth/sign-up.ejs', {
-        title: 'Sign up',
-        msg: ''
-    });
+    res.render('auth/sign-up.ejs', 
+        {title: 'Sign up', msg: ''} )
 }
 
 const addUser = async (req, res) => {
     console.log('request body: ', req.body)
-    const userInDatabase = await User.findOne({ username: req.body.username })
-
+    const userInDatabase = await User.findOne({ username: req.body.username})
     if (userInDatabase) {
-        return res.render('auth/sign-up.ejs', {
-            title: 'Sign up',
+        return res.render('auth/sign-up.ejs',{
+            title: 'Sign up', 
             msg: 'Username already taken.'
         })
     }
-
     if (req.body.password !== req.body.confirmPassword) {
         return res.render('auth/sign-up.ejs', {
             title: 'Sign up',
             msg: 'Password and Confirm Password must match.'
         })
     }
-    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    req.body.password = hashedPassword;
-    // validation logic
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10)
+    req.body.password = hashedPassword
 
-    const user = await User.create(req.body);
+    const user = await User.create(req.body)
+    
     req.session.user = {
-        username: userInDatabase.username,
-    };
-        
+        username: user.username,
+    }
+    
     req.session.save(() => {
-        res.redirect("/");
+        res.redirect('/')
     })
-
+    
 }
-
 
 const signInForm = (req, res) => {
     res.render('auth/sign-in.ejs', {
-        title: 'Sign up',
-        msg: '',
-    });
+        title: 'Sign in',
+        msg: ''
+    })
 }
 
 const signIn = async (req, res) => {
-    console.log('request body: ', req.body)
     const userInDatabase = await User.findOne({ username: req.body.username })
-    console.log('userInDatabase: ', userInDatabase);
-
     if (!userInDatabase) {
-        return res.render("auth/sign-in.ejs", {
+        return res.render('auth/sign-in.ejs', {
             title: 'Sign in',
-            msg: "Invalid credintials. Please try again."
+            msg: 'Invalid credentials. Please try again.'
         })
-
     }
-
-    //Checking if password is correct
+    // CHECKING IF PASSWORD IS CORRECT
     const validPassword = bcrypt.compareSync(
         req.body.password,
         userInDatabase.password
@@ -69,28 +59,29 @@ const signIn = async (req, res) => {
     if (!validPassword) {
         return res.render('auth/sign-in.ejs', {
             title: 'Sign in',
-            msg: 'Invalid credintials. Please try again.'
+            msg: 'Invalid credentials. Please try again.'
         })
-
     }
 
     req.session.user = {
         username: userInDatabase.username,
-    };
-
-    req.session.save(() => {
-        res.redirect("/");
-    })
+    }
     
+    req.session.save(() => {
+        res.redirect('/')
+    })
+
+
 }
 
 const signOut = (req, res) => {
     req.session.destroy(() => {
-        res.clearCookie('connect.sid');
-        res.redirect('/');
-    });
-
+        res.clearCookie('connect.sid')
+        res.redirect('/')
+    })
+    
 }
+
 module.exports = {
     signUp,
     addUser,

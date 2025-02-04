@@ -1,0 +1,15 @@
+<%- include('../partials/head') %>
+<div class="container">
+    <h1>Create a fruit</h1>
+    <form action="/fruits" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" />
+    
+        <label for="isReadyToEat">Ready to Eat?</label>
+        <input type="checkbox" name="isReadyToEat" id="isReadyToEat" />
+    
+        <button type="submit" class="btn btn-info">Add Fruit</button>
+      </form>
+</div>
+
+<%- include('../partials/footer') %>
